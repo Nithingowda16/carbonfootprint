@@ -15,9 +15,14 @@ limiter = Limiter(
 )
 
 def create_app(test_config=None):
+    # Calculate absolute path to frontend/dist dynamically
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(os.path.dirname(base_dir))
+    static_folder = os.path.join(root_dir, 'frontend', 'dist')
+
     app = Flask(__name__, 
-                static_folder='../../frontend/dist', 
-                static_url_path='/')
+                static_folder=static_folder, 
+                static_url_path='/static_placeholder')
     
     # Configuration
     if test_config:
