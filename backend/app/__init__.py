@@ -15,7 +15,9 @@ limiter = Limiter(
 )
 
 def create_app(test_config=None):
-    app = Flask(__name__)
+    app = Flask(__name__, 
+                static_folder='../../frontend/dist', 
+                static_url_path='/')
     
     # Configuration
     if test_config:
@@ -52,13 +54,13 @@ def create_app(test_config=None):
     app.register_blueprint(chatbot_bp, url_prefix='/api/chatbot')
     app.register_blueprint(reports_bp, url_prefix='/api/reports')
 
-    @app.route('/')
-    def index():
-        return jsonify({
-            'name': 'EcoTrack AI API',
-            'status': 'healthy',
-            'version': '1.0.0'
-        })
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        # Serve static asset files if they exist, otherwise fallback to React Router index.html
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return app.send_static_file(path)
+        return app.send_static_file('index.html')
 
     # Error Handlers
     @app.errorhandler(429)
