@@ -211,11 +211,16 @@ def get_summary():
     s_score = 50
     if latest_record and latest_record.details:
         d = latest_record.details
-        if d.get('diet_type') == 'vegan': s_score += 20
-        elif d.get('diet_type') == 'vegetarian': s_score += 15
-        if d.get('recycles'): s_score += 10
-        if d.get('composts'): s_score += 10
-        if float(d.get('renewable_pct', 0)) > 50: s_score += 10
+        if d.get('diet_type') == 'vegan':
+            s_score += 20
+        elif d.get('diet_type') == 'vegetarian':
+            s_score += 15
+        if d.get('recycles'):
+            s_score += 10
+        if d.get('composts'):
+            s_score += 10
+        if float(d.get('renewable_pct', 0)) > 50:
+            s_score += 10
         
     sustainability_score = min(100, s_score)
     

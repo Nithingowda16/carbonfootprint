@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, date
+from datetime import date
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -40,8 +40,11 @@ def create_app(test_config=None):
         app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-dev-secret-key')
         app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 86400  # 1 day
 
-    # Initialize extensions
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # Initialize extensions securely (restrict origins in production)
+    if os.environ.get('FLASK_ENV') == 'production':
+        CORS(app, resources={r"/api/*": {"origins": []}})
+    else:
+        CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5000", "http://127.0.0.1:5000"]}})
     db.init_app(app)
     JWTManager(app)
     limiter.init_app(app)
@@ -74,6 +77,16 @@ def create_app(test_config=None):
             'error': 'Too Many Requests',
             'message': 'Rate limit exceeded. Please try again later.'
         }), 429
+
+    # Secure HTTP response headers
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        return response
 
     # Create tables & seed challenges
     with app.app_context():

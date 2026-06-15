@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import CarbonRecord, User
+from app.models import CarbonRecord
 
 recommendations_bp = Blueprint('recommendations', __name__)
 

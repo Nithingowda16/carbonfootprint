@@ -176,7 +176,6 @@ def get_gamification():
     badges = [badge.to_dict() for badge in user.achievements]
     
     # Leaderboard (top 10 users)
-    leaders = User.query.order_index = User.xp.desc()
     leaders_list = User.query.order_by(User.xp.desc()).limit(10).all()
     leaderboard = [{
         'username': u.username,
