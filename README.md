@@ -4,6 +4,37 @@ EcoTrack AI is a complete, production-ready SaaS platform that helps individuals
 
 ---
 
+## 📋 Submission Overview
+
+### 1. Chosen Vertical
+* **Vertical**: Sustainability, Climate Tech, and Climate Action.
+* **Problem Focus**: Individuals want to contribute to climate action but struggle to understand their personal impact, calculate daily actions accurately, and sustain carbon-reduction habits over time. EcoTrack AI solves this through low-friction daily logging, instant simulation of habit improvements, gamified social challenges, and localized AI chatbot coaching.
+
+### 2. Approach and Logic
+* **Calculation Engine**: The calculation formulas map user inputs directly to carbon footprints in kilograms of $CO_2$ ($kgCO_2$) based on EPA (Environmental Protection Agency) standards:
+  - **Transportation**: $Distance \times Factor_{VehicleType}$ (e.g., Petrol: $0.21 kg/km$, Diesel: $0.19 kg/km$, Electric: $0.05 kg/km$, Public Transport: $0.03 kg/km$).
+  - **Home Electricity**: $kWh \times 0.38 kg/kWh$.
+  - **Diet / Food**: Feeding habits (e.g., High Meat: $8.0 kg/day$, Vegetarian: $2.5 kg/day$, Vegan: $1.5 kg/day$).
+  - **Waste**: $Weight \times Factor_{Recycling}$ (e.g., General Waste: $0.5 kg$, Recycled: $0.1 kg$).
+* **Gamification Loop**: Translates emission savings and daily logs into Experience Points (XP) and Levels. Users unlock achievements and participate in global monthly challenges to encourage continuous participation.
+* **Unified Single-Service Execution**: Rather than deploying the client and API on separate hosting providers (increasing billing costs and introducing CORS latency), our code bundles the React client directly inside the Flask server. Flask acts as a reverse proxy, checking if a path matches a static asset (e.g. `/assets/*`) and falling back to the client-side router `index.html` if it doesn't match API endpoints.
+
+### 3. How the Solution Works
+1. **Onboarding**: Users register and log in securely. The system initializes their carbon logs and active streaks.
+2. **Logging**: Users fill in simple daily entries for their activities (electricity, travel, meals, waste).
+3. **Analytics**: The dashboard converts logs into interactive doughnut charts (via Chart.js) and highlights emission-heavy categories.
+4. **Reduction & Simulation**: Users slide parameters in the Habit Simulator to see how actions (e.g., cutting meat, switching to public transport) translate directly into trees planted.
+5. **Actionable Recommendations**: Custom, localized recommendations are generated dynamically targeting the user's highest emission sectors.
+6. **Chatbot Support**: Users can chat with the offline-first AI assistant to ask questions like "How can I reduce waste?" or "Explain EPA emission factors".
+7. **Reporting**: The ReportLab engine compiles all historical data and formats a structural audit PDF report.
+
+### 4. Assumptions Made
+* **Local Storage Cache**: We assume local storage is available in the user's browser to store JWT authorization tokens.
+* **EPA Emission Factors**: Constant averages are used for factors (such as the standard US/EU electricity grid carbon intensity of $0.38 kg/kWh$). In a production environment, this would resolve dynamically by zip code.
+* **PostgreSQL / SQLite Interoperability**: The backend is built to run on SQLite locally for testing and seamlessly scale to serverless PostgreSQL (e.g., Neon.tech) in production by reading `DATABASE_URL` environment variables.
+
+---
+
 ## Technical Architecture
 
 * **Frontend**: React (Vite, Tailwind CSS, Chart.js, Lucide Icons, Service Worker PWA).
