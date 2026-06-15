@@ -1,0 +1,48 @@
+# Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+backend/venv/
+backend/Lib/
+backend/Scripts/
+backend/Include/
+backend/pyvenv.cfg
+
+
+# Node Modules and Builds
+node_modules/
+dist/
+build/
+.svelte-kit/
+.next/
+
+# IDE files and caches
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and locks
+*.db
+*.sqlite
+ecotrack.db
+
+# Environmental variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Operating System Logs
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: ecotrack_db
+    environment:
+      POSTGRES_USER: ecotrack
+      POSTGRES_PASSWORD: ecotrackpassword
+      POSTGRES_DB: ecotrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecotrack -d ecotrack"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: ecotrack_backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://ecotrack:ecotrackpassword@db:5432/ecotrack
+      SECRET_KEY: production-secure-secret-key-change-me
+      JWT_SECRET_KEY: production-jwt-secret-key-change-me
+      FLASK_DEBUG: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    container_name: ecotrack_frontend
+    ports:
+      - "80:80"
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
