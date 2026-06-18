@@ -11,7 +11,7 @@ def app():
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-        'JWT_SECRET_KEY': 'test-jwt-secret-key-12345',
+        'JWT_SECRET_KEY': 'test-jwt-secret-key-12345-long-enough-32-chars',
         'SECRET_KEY': 'test-secret-key',
         'WTF_CSRF_ENABLED': False
     }

@@ -9,6 +9,10 @@ backend/Scripts/
 backend/Include/
 backend/pyvenv.cfg
 
+# Python bytecode
+__pycache__/
+*.pyc
+
 
 # Node Modules and Builds
 node_modules/

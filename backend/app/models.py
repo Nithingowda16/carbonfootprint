@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -12,14 +12,14 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), default='user', nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Gamification
     xp = db.Column(db.Integer, default=0, nullable=False)
     level = db.Column(db.Integer, default=1, nullable=False)
     streak = db.Column(db.Integer, default=0, nullable=False)
     green_points = db.Column(db.Integer, default=0, nullable=False)
-    last_active = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_active = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     carbon_records = db.relationship('CarbonRecord', backref='user', lazy=True, cascade="all, delete-orphan")
@@ -164,7 +164,7 @@ class UserChallenge(db.Model):
     challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.id', ondelete='CASCADE'), nullable=False, index=True)
     progress = db.Column(db.Float, default=0.0, nullable=False)
     status = db.Column(db.String(20), default='joined', nullable=False) # joined, completed
-    joined_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Establish direct relationship helper
     challenge = db.relationship('Challenge', backref='user_assignments')
@@ -187,7 +187,7 @@ class ChatHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     message = db.Column(db.Text, nullable=False)
     sender = db.Column(db.String(20), nullable=False) # user or bot
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     def to_dict(self):
         return {
@@ -205,7 +205,7 @@ class Achievement(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     badge_key = db.Column(db.String(50), nullable=False) # first_step, eco_warrior, etc.
     badge_name = db.Column(db.String(100), nullable=False) # "First Green Step", "Eco Warrior"
-    unlocked_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    unlocked_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     def to_dict(self):
         return {

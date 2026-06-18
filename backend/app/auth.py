@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models import db, User, Achievement
@@ -28,7 +28,7 @@ def register():
     user.xp = 50
     user.green_points = 10
     user.streak = 1
-    user.last_active = datetime.utcnow()
+    user.last_active = datetime.now(timezone.utc)
     
     db.session.add(user)
     db.session.commit()
@@ -76,7 +76,7 @@ def login():
     elif last_active_date < today - timedelta(days=1):
         user.streak = 1
         
-    user.last_active = datetime.utcnow()
+    user.last_active = datetime.now(timezone.utc)
     db.session.commit()
     
     access_token = create_access_token(identity=str(user.id))
@@ -89,7 +89,7 @@ def login():
 @jwt_required()
 def get_profile():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
     return jsonify(user.to_dict()), 200
@@ -98,7 +98,7 @@ def get_profile():
 @jwt_required()
 def update_profile():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
         
@@ -155,7 +155,7 @@ def reset_password():
     try:
         parts = token.split("-")
         user_id = int(parts[1])
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             raise ValueError()
         user.set_password(new_password)
@@ -168,7 +168,7 @@ def reset_password():
 @jwt_required()
 def get_gamification():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
         

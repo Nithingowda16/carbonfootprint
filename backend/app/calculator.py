@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import db, User, CarbonRecord, Goal, Action, Challenge, UserChallenge, Achievement
@@ -101,7 +101,7 @@ def calculate_co2(details):
 @jwt_required()
 def add_record():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -319,7 +319,7 @@ def get_goals():
                 if avg_current <= goal.target_co2:
                     goal.status = 'completed'
                     # Award level rewards
-                    u = User.query.get(user_id)
+                    u = db.session.get(User, user_id)
                     u.xp += 150
                     u.green_points += 40
                     db.session.add(Achievement(user_id=user_id, badge_key="goal_champion", badge_name="Goal Champion"))
@@ -337,7 +337,7 @@ def get_goals():
 @jwt_required()
 def log_action():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
         
@@ -356,7 +356,7 @@ def log_action():
         money_saved=savings,
         difficulty=difficulty,
         status='completed',
-        completed_at=datetime.utcnow()
+        completed_at=datetime.now(timezone.utc)
     )
     
     # Award gamification reward points
@@ -404,7 +404,7 @@ def list_challenges():
 @jwt_required()
 def join_challenge(challenge_id):
     user_id = int(get_jwt_identity())
-    challenge = Challenge.query.get(challenge_id)
+    challenge = db.session.get(Challenge, challenge_id)
     if not challenge:
         return jsonify({'error': 'Challenge not found'}), 404
         
@@ -443,7 +443,7 @@ def log_challenge_progress(challenge_id):
         uc.status = 'completed'
         
         # Award completion rewards
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         user.xp += challenge.xp_reward
         user.green_points += challenge.points_reward
         

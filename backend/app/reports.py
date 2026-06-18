@@ -1,5 +1,5 @@
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, send_file, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from reportlab.lib.pagesizes import letter
@@ -7,7 +7,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
-from app.models import CarbonRecord, User, Goal, Achievement
+from app.models import db, CarbonRecord, User, Goal, Achievement
 
 reports_bp = Blueprint('reports', __name__)
 
@@ -15,7 +15,7 @@ reports_bp = Blueprint('reports', __name__)
 @jwt_required()
 def download_pdf_report():
     user_id = int(get_jwt_identity())
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
         
