@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ecotrack-ai
+    runtime: docker
+    plan: free
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # Neon PostgreSQL database connection string
+      - key: SECRET_KEY
+        generateValue: true # Generates a secure random key automatically
+      - key: JWT_SECRET_KEY
+        generateValue: true # Generates a secure JWT signing key automatically
